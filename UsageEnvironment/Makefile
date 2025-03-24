@@ -1,0 +1,70 @@
+INCLUDES = -Iinclude -I../groupsock/include
+PREFIX = /usr/local
+LIBDIR = $(PREFIX)/lib
+##### Change the following for your environment:
+NDK=/home/maqi/Android/android-ndk-r26b
+TOOLCHAIN=$(NDK)/toolchains/llvm/prebuilt/linux-x86_64
+API=21
+SYSROOT=$(TOOLCHAIN)/sysroot
+CROSS_PREFIX=$(TOOLCHAIN)/bin/aarch64-linux-android-
+DESTDIR=$(shell pwd)/../arm64-v8a/lib
+
+COMPILE_OPTS =         $(INCLUDES) -m64  -fPIC -fpic -I$(SYSROOT)/usr/local/include -I. -O2 -DSOCKLEN_T=socklen_t -D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64 -DNO_OPENSSL=1 -DNO_GETIFADDRS=1 --sysroot=$(SYSROOT)
+C =                     c
+C_COMPILER =            $(TOOLCHAIN)/bin/aarch64-linux-android$(API)-clang
+C_FLAGS =               $(COMPILE_OPTS)
+CPP =                   cpp
+CPLUSPLUS_COMPILER =    $(TOOLCHAIN)/bin/aarch64-linux-android$(API)-clang++
+CPLUSPLUS_FLAGS =       $(COMPILE_OPTS) -Wall -DBSD=1
+OBJ =                   o
+LINK =                  $(CPLUSPLUS_COMPILER) -o 
+LINK_OPTS =             -static-libstdc++
+CONSOLE_LINK_OPTS =     $(LINK_OPTS)
+LIBRARY_LINK =          $(CPLUSPLUS_COMPILER) -shared -o
+LIBRARY_LINK_OPTS =		-Wl,-soname,$(NAME).so -static-libstdc++
+LIB_SUFFIX =            so
+LIBS_FOR_CONSOLE_APPLICATION =  
+LIBS_FOR_GUI_APPLICATION =
+EXE =
+#INSTALL2 =		install_shared_libraries
+
+
+NAME = libUsageEnvironment
+USAGE_ENVIRONMENT_LIB = $(NAME).$(LIB_SUFFIX)
+ALL = $(USAGE_ENVIRONMENT_LIB)
+all:	$(ALL)
+
+OBJS = UsageEnvironment.$(OBJ) HashTable.$(OBJ) strDup.$(OBJ)
+
+$(NAME).so: $(OBJS)
+	$(CPLUSPLUS_COMPILER) -shared -o $@ $(OBJS) -static-libstdc++ -Wl,-soname,$(NAME).so
+
+$(USAGE_ENVIRONMENT_LIB): $(OBJS)
+	$(LIBRARY_LINK)$@ $(LIBRARY_LINK_OPTS) $(OBJS)
+
+.$(C).$(OBJ):
+	$(C_COMPILER) -c $(C_FLAGS) $<       
+
+.$(CPP).$(OBJ):
+	$(CPLUSPLUS_COMPILER) -c $(CPLUSPLUS_FLAGS) $<
+
+UsageEnvironment.$(CPP):	include/UsageEnvironment.hh
+include/UsageEnvironment.hh:	include/UsageEnvironment_version.hh include/Boolean.hh include/strDup.hh
+HashTable.$(CPP):		include/HashTable.hh
+include/HashTable.hh:		include/Boolean.hh
+strDup.$(CPP):			include/strDup.hh
+
+
+clean:
+	-rm -rf *.$(OBJ) $(ALL) core *.core *~ include/*~
+
+install: install1 $(INSTALL2)
+install1: $(USAGE_ENVIRONMENT_LIB)
+	  install -d $(DESTDIR)$(PREFIX)/include/UsageEnvironment $(DESTDIR)$(LIBDIR)
+	  install -m 644 include/*.hh $(DESTDIR)$(PREFIX)/include/UsageEnvironment
+	  install -m 644 $(USAGE_ENVIRONMENT_LIB) $(DESTDIR)$(LIBDIR)
+install_shared_libraries: $(USAGE_ENVIRONMENT_LIB)
+	  install -d $(DESTDIR)
+	  cp libBasicUsageEnvironment.so $(DESTDIR)/
+
+##### Any additional, platform-specific rules come here:
