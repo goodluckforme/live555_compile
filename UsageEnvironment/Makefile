@@ -36,11 +36,12 @@ all:	$(ALL)
 
 OBJS = UsageEnvironment.$(OBJ) HashTable.$(OBJ) strDup.$(OBJ)
 
-$(NAME).so: $(OBJS)
-	$(CPLUSPLUS_COMPILER) -shared -o $@ $(OBJS) -static-libstdc++ -Wl,-soname,$(NAME).so
 
 $(USAGE_ENVIRONMENT_LIB): $(OBJS)
 	$(LIBRARY_LINK)$@ $(LIBRARY_LINK_OPTS) $(OBJS)
+
+$(NAME).so: $(OBJS)
+	$(CPLUSPLUS_COMPILER) -shared -o $@ $(OBJS) -static-libstdc++ -Wl,-soname,$(NAME).so
 
 .$(C).$(OBJ):
 	$(C_COMPILER) -c $(C_FLAGS) $<       
