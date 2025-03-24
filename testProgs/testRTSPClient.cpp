@@ -61,9 +61,10 @@ void usage(UsageEnvironment& env, char const* progName) {
   env << "\t(where each <rtsp-url-i> is a \"rtsp://\" URL)\n";
 }
 
-EventLoopWatchVariable eventLoopWatchVariable = 0;
+EventLoopWatchVariable eventLoopWatchVariable;
 
 int main(int argc, char** argv) {
+  EventLoopWatchVariable eventLoopWatchVariable(0);
   // Begin by setting up our usage environment:
   TaskScheduler* scheduler = BasicTaskScheduler::createNew();
   UsageEnvironment* env = BasicUsageEnvironment::createNew(*scheduler);
