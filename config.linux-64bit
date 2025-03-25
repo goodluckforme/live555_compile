@@ -1,4 +1,4 @@
-DESTDIR=$(shell pwd)/../arm64-v8a
+#DESTDIR=$(shell pwd)/../linux-64bit
 COMPILE_OPTS =		$(INCLUDES) -m64  -fPIC -I/usr/local/include -I. -O2 -DSOCKLEN_T=socklen_t -D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64
 C =			c
 C_COMPILER =		cc
